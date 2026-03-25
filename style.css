@@ -65,6 +65,19 @@ body::before {
     padding: 0 var(--spacing-sm);
 }
 
+/* ===== Mouse Glow Effect ===== */
+#mouseGlow {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.06) 0%, rgba(6, 182, 212, 0.03) 40%, transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: left 0.15s ease, top 0.15s ease;
+}
+
 /* ===== Trail Canvas ===== */
 .trail-canvas {
     position: fixed;
@@ -236,7 +249,7 @@ body::before {
 }
 
 .hero-title {
-    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 2rem;
@@ -1127,5 +1140,32 @@ section {
 
     .loading-bar {
         width: 220px;
+    }
+}
+
+/* ===== Keyframes Animations ===== */
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+    }
+    20% {
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        transform: translate(-2px, -2px);
+    }
+    60% {
+        transform: translate(2px, 2px);
+    }
+    80% {
+        transform: translate(2px, -2px);
+    }
+    100% {
+        transform: translate(0);
     }
 }

@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23a855f7'/><stop offset='100%25' stop-color='%2306b6d4'/></linearGradient></defs><text y='26' font-size='28' font-family='Arial Black' fill='url(%23g)'>M</text></svg>">
     <link rel="stylesheet" href="style.css">
     <style>
         /* Inline loading screen styles to ensure they load first */
@@ -75,6 +76,9 @@
         </div>
     </div>
 
+    <!-- Mouse Glow Effect -->
+    <div id="mouseGlow"></div>
+
     <!-- Cursor Trail Canvas -->
     <canvas id="trailCanvas" class="trail-canvas"></canvas>
 
@@ -86,7 +90,7 @@
         <div class="container">
             <div class="nav-content">
                 <a href="#" class="logo">
-                    <svg class="logo-icon" width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="logo-icon" width="36" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
                         <defs>
                             <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />

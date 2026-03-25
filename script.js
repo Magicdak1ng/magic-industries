@@ -18,10 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1200);
 });
 
-// ===== Cursor Trail Effect - CANVAS OPTIMISÉ 60FPS =====
+// ===== Mouse Effects (Trail + Glow) - OPTIMISÉ =====
 if (!isMobile) {
     const trailCanvas = document.getElementById('trailCanvas');
     const trailCtx = trailCanvas.getContext('2d', { alpha: true });
+    const mouseGlow = document.getElementById('mouseGlow');
 
     trailCanvas.width = window.innerWidth;
     trailCanvas.height = window.innerHeight;
@@ -29,6 +30,11 @@ if (!isMobile) {
     const trailParticles = [];
     const violet = '#a855f7';
     const cyan = '#06b6d4';
+
+    let lastTrailTime = 0;
+    let mouseX = 0;
+    let mouseY = 0;
+    let glowUpdateScheduled = false;
 
     class TrailParticle {
         constructor(x, y) {
@@ -62,12 +68,33 @@ if (!isMobile) {
         }
     }
 
-    // Spawn particules sur mousemove
+    // Update mouse glow via RAF
+    function updateMouseGlow() {
+        mouseGlow.style.left = mouseX + 'px';
+        mouseGlow.style.top = mouseY + 'px';
+        glowUpdateScheduled = false;
+    }
+
+    // Listener mousemove fusionné (trail throttle + glow RAF)
     document.addEventListener('mousemove', (e) => {
-        trailParticles.push(new TrailParticle(e.clientX, e.clientY));
+        const now = Date.now();
+
+        // Trail throttle à 16ms (1 frame)
+        if (now - lastTrailTime >= 16) {
+            trailParticles.push(new TrailParticle(e.clientX, e.clientY));
+            lastTrailTime = now;
+        }
+
+        // Mouse glow position update (via RAF pour smooth)
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if (!glowUpdateScheduled) {
+            glowUpdateScheduled = true;
+            requestAnimationFrame(updateMouseGlow);
+        }
     });
 
-    // Animation loop unique
+    // Animation loop unique pour trail
     function animateTrail() {
         trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
 
@@ -153,6 +180,7 @@ function animateParticles() {
     }
 
     // Draw connections - MAX 2 connections par particule, distance au carré
+    ctx.save(); // Prevent canvas state leaks
     for (let i = 0; i < particles.length; i++) {
         let connectionCount = 0;
         const maxConnections = 2;
@@ -176,6 +204,7 @@ function animateParticles() {
             }
         }
     }
+    ctx.restore(); // Restore canvas state
 
     requestAnimationFrame(animateParticles);
 }
@@ -474,16 +503,6 @@ if (heroTitle) {
     }, 500);
 }
 
-// Add CSS for cursor blink animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes blink {
-        0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0; }
-    }
-`;
-document.head.appendChild(style);
-
 // ===== Add counter animation for pricing =====
 const animateCounter = (element, target, duration = 1000) => {
     let current = 0;
@@ -545,4 +564,4 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 }
 
 console.log('✨ Magic Industries - Ultra-Optimized 60fps Website!');
-console.log('🚀 Cursor Trail Canvas | Optimized Particles | Smooth Scroll Lerp');
+console.log('🚀 Cursor Trail + Glow | Optimized Particles | Smooth Scroll Lerp');
