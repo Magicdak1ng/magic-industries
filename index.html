@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin">
+    <title>Magic Industries - Agence Web Professionnelle</title>
+    <meta name="description" content="Magic Industries - Création de sites web modernes et performants. Devis gratuit.">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Inline loading screen styles to ensure they load first */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #080808;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        #loadingScreen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        /* Ensure body content is visible */
+        body {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        .navbar, .hero, section, footer {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+    </style>
+    <script>
+        // Inline script to hide loading screen - runs immediately
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const loader = document.getElementById('loadingScreen');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    setTimeout(function() {
+                        loader.style.display = 'none';
+                    }, 500);
+                }
+            }, 1500);
+        });
+
+        // Fallback - force hide after 2.5 seconds
+        setTimeout(function() {
+            const loader = document.getElementById('loadingScreen');
+            if (loader) {
+                loader.style.opacity = '0';
+                loader.style.display = 'none';
+            }
+        }, 2500);
+    </script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-logo">Magic Industries</div>
+            <div class="loading-subtitle">Web · Design · Development</div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div id="cursor"></div>
+
+    <!-- Particles Container -->
+    <canvas id="particlesCanvas" class="particles-canvas"></canvas>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="#" class="logo">Magic Industries</a>
+                <button class="menu-toggle" id="menuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#hero">Accueil</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#avantages">Avantages</a></li>
+                    <li><a href="#portfolio">Portfolio</a></li>
+                    <li><a href="#tarifs">Tarifs</a></li>
+                    <li><a href="#contact" class="btn-contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="hero-background"></div>
+        <div class="decorative-lines">
+            <div class="line line-1"></div>
+            <div class="line line-2"></div>
+            <div class="line line-3"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Transformez votre vision en <span class="gradient-text">réalité digitale</span></h1>
+                <p class="hero-subtitle">Création de sites web modernes et performants qui propulsent votre entreprise vers le succès</p>
+                <a href="#contact" class="btn btn-primary">Demander un devis</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nos Services</h2>
+                <p class="section-subtitle">Des solutions sur mesure pour votre présence en ligne</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <h3>Création de sites vitrines</h3>
+                    <p>Sites web élégants et professionnels qui reflètent l'image de votre entreprise et convertissent vos visiteurs en clients.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                            <path d="M11 8v6"/>
+                            <path d="M8 11h6"/>
+                        </svg>
+                    </div>
+                    <h3>SEO</h3>
+                    <p>Optimisation pour les moteurs de recherche afin d'améliorer votre visibilité et attirer plus de clients qualifiés.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h3>Maintenance</h3>
+                    <p>Support technique continu et mises à jour régulières pour garantir la sécurité et la performance de votre site.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
+                            <polyline points="7.5 19.79 7.5 14.6 3 12"/>
+                            <polyline points="21 12 16.5 14.6 16.5 19.79"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                    </div>
+                    <h3>Refonte de site</h3>
+                    <p>Modernisation complète de votre site existant avec un design actuel et des fonctionnalités optimisées.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Avantages Section -->
+    <section id="avantages" class="avantages">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Pourquoi nous choisir</h2>
+                <p class="section-subtitle">L'excellence au service de votre réussite</p>
+            </div>
+            <div class="avantages-grid">
+                <div class="avantage-card">
+                    <div class="avantage-icon">⚡</div>
+                    <h3>Livraison rapide</h3>
+                    <p>Votre site prêt en 2 à 4 semaines selon la formule choisie</p>
+                </div>
+                <div class="avantage-card">
+                    <div class="avantage-icon">💰</div>
+                    <h3>Prix compétitifs</h3>
+                    <p>Des tarifs transparents et accessibles pour tous les budgets</p>
+                </div>
+                <div class="avantage-card">
+                    <div class="avantage-icon">🚀</div>
+                    <h3>Support réactif</h3>
+                    <p>Une équipe disponible pour répondre à toutes vos questions</p>
+                </div>
+                <div class="avantage-card">
+                    <div class="avantage-icon">✨</div>
+                    <h3>Sites modernes</h3>
+                    <p>Design contemporain et technologies de pointe</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">10+</div>
+                    <div class="stat-label">Projets réalisés</div>
+                    <div class="stat-decoration"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Satisfaction client</div>
+                    <div class="stat-decoration"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Ans d'expérience</div>
+                    <div class="stat-decoration"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">7/7</div>
+                    <div class="stat-label">Support disponible</div>
+                    <div class="stat-decoration"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Notre Portfolio</h2>
+                <p class="section-subtitle">Découvrez nos réalisations</p>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-card">
+                    <div class="portfolio-image">
+                        <iframe
+                            src="https://la-bella-vita-gold.vercel.app"
+                            class="portfolio-iframe"
+                            loading="lazy"
+                            title="La Bella Vita - Restaurant Italien"
+                            sandbox="allow-same-origin allow-scripts"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                        <div class="portfolio-overlay">
+                            <a href="https://la-bella-vita-gold.vercel.app" target="_blank" rel="noopener noreferrer" class="btn btn-view-site">
+                                Voir le site
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                    <polyline points="15 3 21 3 21 9"/>
+                                    <line x1="10" y1="14" x2="21" y2="3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>La Bella Vita</h3>
+                        <p class="portfolio-category">Restaurant Italien</p>
+                        <p>Site vitrine élégant pour un restaurant italien authentique avec système de réservation en ligne et menu interactif.</p>
+                        <div class="portfolio-tags">
+                            <span>Design moderne</span>
+                            <span>Responsive</span>
+                            <span>SEO optimisé</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tarifs Section -->
+    <section id="tarifs" class="tarifs">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nos Tarifs</h2>
+                <p class="section-subtitle">Choisissez la formule adaptée à vos besoins</p>
+            </div>
+            <div class="tarifs-grid">
+                <div class="tarif-card">
+                    <div class="tarif-header">
+                        <h3>Basique</h3>
+                        <div class="tarif-price">
+                            <span class="price">400€</span>
+                        </div>
+                    </div>
+                    <ul class="tarif-features">
+                        <li>✓ Site 1-3 pages</li>
+                        <li>✓ Design responsive</li>
+                        <li>✓ Formulaire de contact</li>
+                        <li>✓ SEO de base</li>
+                        <li>✓ Livraison en 5-7 jours</li>
+                        <li class="maintenance-line">+ Maintenance 30€/mois</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-secondary">Choisir</a>
+                </div>
+                <div class="tarif-card featured">
+                    <div class="badge">Populaire</div>
+                    <div class="tarif-header">
+                        <h3>Pro</h3>
+                        <div class="tarif-price">
+                            <span class="price">800€</span>
+                        </div>
+                    </div>
+                    <ul class="tarif-features">
+                        <li>✓ Site 4-7 pages</li>
+                        <li>✓ Design sur mesure</li>
+                        <li>✓ Animations avancées</li>
+                        <li>✓ SEO optimisé</li>
+                        <li>✓ Galerie photos</li>
+                        <li>✓ Livraison en 10-14 jours</li>
+                        <li class="maintenance-line">+ Maintenance 50€/mois</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-primary">Choisir</a>
+                </div>
+                <div class="tarif-card">
+                    <div class="tarif-header">
+                        <h3>Premium</h3>
+                        <div class="tarif-price">
+                            <span class="price">1500€</span>
+                        </div>
+                    </div>
+                    <ul class="tarif-features">
+                        <li>✓ Site illimité</li>
+                        <li>✓ Design premium unique</li>
+                        <li>✓ Fonctionnalités avancées</li>
+                        <li>✓ SEO expert</li>
+                        <li>✓ Espace client</li>
+                        <li>✓ Formation à la prise en main incluse</li>
+                        <li>✓ Livraison en 3 semaines</li>
+                        <li class="maintenance-line">+ Maintenance 80€/mois</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-secondary">Choisir</a>
+                </div>
+            </div>
+            <div class="tarifs-note">
+                <p>* Maintenance optionnelle — modifications de contenu, mises à jour et support inclus</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Contactez-nous</h2>
+                <p class="section-subtitle">Démarrons votre projet ensemble</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Parlons de votre projet</h3>
+                    <p>Nous sommes là pour répondre à toutes vos questions et vous accompagner dans la réalisation de votre site web.</p>
+                    <div class="contact-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        <a href="mailto:contact.magicindustries@gmail.com">contact.magicindustries@gmail.com</a>
+                    </div>
+                </div>
+                <form class="contact-form" id="contactForm" action="https://formspree.io/f/mdapnwdg" method="POST">
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" placeholder="Votre nom" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" placeholder="Votre email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" id="phone" name="phone" placeholder="Votre téléphone">
+                    </div>
+                    <div class="form-group">
+                        <select id="service" name="service" required>
+                            <option value="">Sélectionnez un service</option>
+                            <option value="vitrine">Site vitrine</option>
+                            <option value="seo">SEO</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="refonte">Refonte</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="message" name="message" rows="5" placeholder="Décrivez votre projet" required></textarea>
+                    </div>
+                    <input type="hidden" name="_next" value="#contact">
+                    <input type="hidden" name="_subject" value="Nouveau message de Magic Industries">
+                    <button type="submit" class="btn btn-primary">Envoyer le message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4 class="logo">Magic Industries</h4>
+                    <p>Votre partenaire digital pour un web d'excellence</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#avantages">Avantages</a></li>
+                        <li><a href="#portfolio">Portfolio</a></li>
+                        <li><a href="#tarifs">Tarifs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="mailto:contact.magicindustries@gmail.com">contact.magicindustries@gmail.com</a></li>
+                        <li><a href="#contact">Demander un devis</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Magic Industries. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
