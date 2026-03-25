@@ -1,7 +1,7 @@
 // ===== Loading Screen =====
 // Loading screen is now handled inline in HTML for reliability
 
-// ===== Simple Custom Cursor with CSS Variables =====
+// ===== Simple Custom Cursor =====
 (function initSimpleCursor() {
     // Only on desktop
     if (window.innerWidth <= 768) return;
@@ -12,10 +12,10 @@
     // Add cursor-active class to hide default cursor
     document.body.classList.add('cursor-active');
 
-    // Update CSS variables on mouse move
+    // Update cursor position on mouse move
     document.addEventListener('mousemove', (e) => {
-        document.body.style.setProperty('--x', e.clientX);
-        document.body.style.setProperty('--y', e.clientY);
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
     });
 
     console.log('✨ Simple cursor initialized!');

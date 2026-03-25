@@ -870,7 +870,7 @@ section.scroll-reveal.visible {
     }
 }
 
-/* ===== Custom Cursor - Simple CSS Only ===== */
+/* ===== Custom Cursor - Simple ===== */
 #cursor {
     width: 20px;
     height: 20px;
@@ -879,8 +879,8 @@ section.scroll-reveal.visible {
     position: fixed;
     pointer-events: none;
     z-index: 9999;
-    transform: translate(calc(var(--x, 0) * 1px - 50%), calc(var(--y, 0) * 1px - 50%));
-    transition: transform 0.05s ease-out;
+    transform: translate(-50%, -50%);
+    transition: none;
 }
 
 body.cursor-active {
