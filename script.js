@@ -1,35 +1,114 @@
+// ===== Performance Settings =====
+const isMobile = window.innerWidth <= 768;
+
 // ===== Loading Screen =====
-// Loading screen is now handled inline in HTML for reliability
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const loader = document.getElementById('loadingScreen');
+        if (loader) {
+            loader.classList.add('hidden');
+            setTimeout(function() {
+                loader.style.display = 'none';
+            }, 500);
+        }
+    }, 1500);
+});
 
-// ===== Simple Custom Cursor =====
-(function initSimpleCursor() {
-    // Only on desktop
-    if (window.innerWidth <= 768) return;
+// Fallback - force hide after 2.5 seconds
+setTimeout(function() {
+    const loader = document.getElementById('loadingScreen');
+    if (loader) {
+        loader.style.opacity = '0';
+        loader.style.display = 'none';
+    }
+}, 2500);
 
-    const cursor = document.getElementById('cursor');
-    if (!cursor) return;
+// ===== Cursor Trail Effect (Canvas) =====
+if (!isMobile) {
+    const trailCanvas = document.getElementById('cursorTrail');
+    const trailCtx = trailCanvas.getContext('2d', { alpha: true });
 
-    // Add cursor-active class to hide default cursor
-    document.body.classList.add('cursor-active');
+    trailCanvas.width = window.innerWidth;
+    trailCanvas.height = window.innerHeight;
 
-    // Update cursor position on mouse move
+    const trailParticles = [];
+    const maxTrailParticles = 30;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    class TrailParticle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.size = Math.random() * 3 + 2;
+            this.life = 1;
+            this.decay = Math.random() * 0.02 + 0.02;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.color = Math.random() > 0.5 ? 'rgba(168, 85, 247,' : 'rgba(6, 182, 212,';
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= this.decay;
+            this.size *= 0.98;
+        }
+
+        draw() {
+            trailCtx.fillStyle = this.color + this.life + ')';
+            trailCtx.beginPath();
+            trailCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            trailCtx.fill();
+        }
+    }
+
     document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        // Add new trail particles
+        if (trailParticles.length < maxTrailParticles) {
+            trailParticles.push(new TrailParticle(mouseX, mouseY));
+        }
     });
 
-    console.log('✨ Simple cursor initialized!');
-})();
+    function animateTrail() {
+        trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
 
-// ===== Particles Animation =====
+        // Update and draw trail particles
+        for (let i = trailParticles.length - 1; i >= 0; i--) {
+            trailParticles[i].update();
+            trailParticles[i].draw();
+
+            // Remove dead particles
+            if (trailParticles[i].life <= 0 || trailParticles[i].size <= 0.5) {
+                trailParticles.splice(i, 1);
+            }
+        }
+
+        requestAnimationFrame(animateTrail);
+    }
+
+    animateTrail();
+
+    window.addEventListener('resize', () => {
+        trailCanvas.width = window.innerWidth;
+        trailCanvas.height = window.innerHeight;
+    });
+}
+
+// ===== Optimized Background Particles =====
 const canvas = document.getElementById('particlesCanvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d', { alpha: true });
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 const particles = [];
-const particleCount = 30; // Reduced from 50 for better performance
+const particleCount = isMobile ? 15 : 25;
+const maxDistance = 120; // For squared distance comparison
+const maxDistanceSquared = maxDistance * maxDistance;
 
 class Particle {
     constructor() {
@@ -73,20 +152,21 @@ function animateParticles() {
         particles[i].draw();
     }
 
-    // Draw connections - optimized with reduced distance and limit
+    // Draw connections - optimized with squared distance
     for (let i = 0; i < particles.length; i++) {
         let connectionCount = 0;
-        const maxConnections = 3; // Limit connections per particle
+        const maxConnections = 3;
 
         for (let j = i + 1; j < particles.length; j++) {
             if (connectionCount >= maxConnections) break;
 
             const dx = particles[i].x - particles[j].x;
             const dy = particles[i].y - particles[j].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const distanceSquared = dx * dx + dy * dy; // No sqrt!
 
-            if (distance < 120) { // Reduced from 150
-                ctx.strokeStyle = `rgba(168, 85, 247, ${0.08 * (1 - distance / 120)})`;
+            if (distanceSquared < maxDistanceSquared) {
+                const opacity = 0.08 * (1 - distanceSquared / maxDistanceSquared);
+                ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`;
                 ctx.lineWidth = 0.5;
                 ctx.beginPath();
                 ctx.moveTo(particles[i].x, particles[i].y);
@@ -107,18 +187,15 @@ window.addEventListener('resize', () => {
     canvas.height = window.innerHeight;
 });
 
-// ===== Stats Counter Animation =====
-// Stats are now displayed as static text (10+, 100%, 2, 7/7)
-// No animation needed
-
-// ===== Text Reveal on Scroll =====
+// ===== Text Reveal on Scroll with IntersectionObserver =====
 const revealTextObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('revealed');
+            revealTextObserver.unobserve(entry.target);
         }
     });
-}, { threshold: 0.1 });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
 document.querySelectorAll('.section-title, .section-subtitle').forEach(el => {
     el.classList.add('reveal-text');
@@ -139,7 +216,7 @@ window.addEventListener('scroll', () => {
     }
 
     lastScroll = currentScroll;
-});
+}, { passive: true });
 
 // ===== Mobile Menu Toggle =====
 const menuToggle = document.getElementById('menuToggle');
@@ -177,6 +254,7 @@ const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
         }
     });
 }, observerOptions);
@@ -187,39 +265,34 @@ document.querySelectorAll('section').forEach(section => {
 });
 
 // Make hero section visible immediately
-document.querySelector('.hero').classList.add('visible');
+document.querySelector('.hero')?.classList.add('visible');
 
-// ===== Animate Cards on Scroll =====
-const cardObserverOptions = {
-    root: null,
-    threshold: 0.1,
-    rootMargin: '0px'
-};
-
+// ===== Animate Cards on Scroll with Stagger Effect =====
 const cardObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry, index) => {
+    entries.forEach(entry => {
         if (entry.isIntersecting) {
-            setTimeout(() => {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }, index * 100);
+            const cards = entry.target.querySelectorAll('.service-card, .avantage-card, .tarif-card, .stat-card');
+
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            cardObserver.unobserve(entry.target);
         }
     });
-}, cardObserverOptions);
+}, { threshold: 0.1, rootMargin: '0px 0px -100px 0px' });
 
-// Observe all cards with stagger effect
-const animateCards = () => {
-    const cards = document.querySelectorAll('.service-card, .avantage-card, .tarif-card');
-    cards.forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        cardObserver.observe(card);
-    });
-};
-
-// Run after DOM is loaded
-setTimeout(animateCards, 100);
+// Observe sections that contain cards
+document.querySelectorAll('.services, .avantages, .tarifs, .stats').forEach(section => {
+    cardObserver.observe(section);
+});
 
 // ===== Active Nav Link on Scroll =====
 const sections = document.querySelectorAll('section[id]');
@@ -244,7 +317,7 @@ const highlightNav = () => {
     });
 };
 
-window.addEventListener('scroll', highlightNav);
+window.addEventListener('scroll', highlightNav, { passive: true });
 
 // ===== Contact Form Handling with Formspree =====
 const contactForm = document.getElementById('contactForm');
@@ -349,28 +422,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// ===== Add hover effect to portfolio image =====
-const portfolioCard = document.querySelector('.portfolio-card');
-if (portfolioCard) {
-    portfolioCard.addEventListener('mousemove', (e) => {
-        const rect = portfolioCard.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        const rotateX = (y - centerY) / 20;
-        const rotateY = (centerX - x) / 20;
-
-        portfolioCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
-    });
-
-    portfolioCard.addEventListener('mouseleave', () => {
-        portfolioCard.style.transform = '';
-    });
-}
-
 // ===== Typing Effect for Hero Title =====
 const heroTitle = document.querySelector('.hero-title');
 if (heroTitle) {
@@ -431,15 +482,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// ===== Dynamic year in footer =====
-// Footer year is now fixed at 2026 in HTML
-// const updateFooterYear = () => {
-//     const footerText = document.querySelector('.footer-bottom p');
-//     if (footerText) {
-//         footerText.innerHTML = `&copy; 2026 Magic Industries. Tous droits réservés.`;
-//     }
-// };
-
 // ===== Add counter animation for pricing =====
 const animateCounter = (element, target, duration = 1000) => {
     let current = 0;
@@ -466,6 +508,7 @@ const pricingObserver = new IntersectionObserver((entries) => {
                 priceElement.dataset.animated = 'true';
                 animateCounter(priceElement, priceValue, 1500);
             }
+            pricingObserver.unobserve(entry.target);
         }
     });
 }, { threshold: 0.5 });
@@ -490,53 +533,6 @@ formInputs.forEach(input => {
         input.style.borderColor = 'var(--violet)';
     });
 });
-
-// ===== Performance optimization: Debounce scroll events =====
-const debounce = (func, wait) => {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-};
-
-// Apply debounce to scroll-heavy functions
-const debouncedHighlightNav = debounce(highlightNav, 50);
-window.addEventListener('scroll', debouncedHighlightNav);
-
-// ===== Matrix Code Background Effect =====
-// Removed for performance optimization
-
-// ===== Micro-interactions on Cards - Simplified =====
-// Removed complex 3D transforms to prevent hover bugs
-// Cards now use CSS-only hover effects
-
-// ===== Smooth Transitions Between Sections =====
-const sections = document.querySelectorAll('section');
-
-const sectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
-});
-
-sections.forEach(section => {
-    sectionObserver.observe(section);
-});
-
-// ===== Interactive Hover on Portfolio =====
-// Removed complex 3D transforms to prevent hover bugs
-// Portfolio card now uses CSS-only hover effects
 
 // ===== Add Glitch Effect to Logo on Hover =====
 const logo = document.querySelector('.logo');
@@ -576,17 +572,6 @@ glitchStyle.textContent = `
 `;
 document.head.appendChild(glitchStyle);
 
-// ===== Gradient Animation on Scroll =====
-let scrollTimeout;
-window.addEventListener('scroll', () => {
-    document.body.style.setProperty('--scroll-position', window.pageYOffset);
-
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-        // Trigger any scroll-end animations here
-    }, 100);
-}, { passive: true });
-
 // ===== Performance: Disable animations on low-end devices =====
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.querySelectorAll('*').forEach(el => {
@@ -596,4 +581,4 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 }
 
 console.log('✨ Magic Industries - Premium Website Loaded Successfully!');
-console.log('🚀 Featuring: Custom Cursor, Particles, Stats Counter, Text Reveal, Parallax & More!');
+console.log('🚀 Featuring: Cursor Trail, Optimized Particles, 60fps Animations & More!');
