@@ -1,88 +1,83 @@
 // ===== Performance Settings =====
 const isMobile = window.innerWidth <= 768;
 
-// ===== Loading Screen =====
+// ===== Loading Screen - TIMING PRÉCIS =====
+// Barre se remplit en 1.2s, puis fade out en 0.4s
 document.addEventListener('DOMContentLoaded', function() {
+    const loader = document.getElementById('loadingScreen');
+
+    // Après 1.2s (fin de la barre), fade out de 0.4s
     setTimeout(function() {
-        const loader = document.getElementById('loadingScreen');
         if (loader) {
             loader.classList.add('hidden');
+            // Display none après le fade (0.4s)
             setTimeout(function() {
                 loader.style.display = 'none';
-            }, 500);
+            }, 400);
         }
-    }, 1500);
+    }, 1200);
 });
 
-// Fallback - force hide after 2.5 seconds
-setTimeout(function() {
-    const loader = document.getElementById('loadingScreen');
-    if (loader) {
-        loader.style.opacity = '0';
-        loader.style.display = 'none';
-    }
-}, 2500);
-
-// ===== Cursor Trail Effect (Canvas) =====
+// ===== Cursor Trail Effect - CANVAS OPTIMISÉ 60FPS =====
 if (!isMobile) {
-    const trailCanvas = document.getElementById('cursorTrail');
+    const trailCanvas = document.getElementById('trailCanvas');
     const trailCtx = trailCanvas.getContext('2d', { alpha: true });
 
     trailCanvas.width = window.innerWidth;
     trailCanvas.height = window.innerHeight;
 
     const trailParticles = [];
-    const maxTrailParticles = 30;
-    let mouseX = 0;
-    let mouseY = 0;
+    const violet = '#a855f7';
+    const cyan = '#06b6d4';
 
     class TrailParticle {
         constructor(x, y) {
             this.x = x;
             this.y = y;
-            this.size = Math.random() * 3 + 2;
-            this.life = 1;
-            this.decay = Math.random() * 0.02 + 0.02;
-            this.vx = (Math.random() - 0.5) * 0.5;
-            this.vy = (Math.random() - 0.5) * 0.5;
-            this.color = Math.random() > 0.5 ? 'rgba(168, 85, 247,' : 'rgba(6, 182, 212,';
+            this.size = Math.random() * 4 + 4; // 4-8px
+            this.color = Math.random() > 0.5 ? violet : cyan;
+            this.life = 40; // 40 frames lifetime
+            this.maxLife = 40;
         }
 
         update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            this.life -= this.decay;
-            this.size *= 0.98;
+            this.life--;
+            this.y += 0.3; // Déplacement vers le bas
+
+            // Easing out pour la taille et l'opacité
+            const lifeRatio = this.life / this.maxLife;
+            this.currentSize = this.size * lifeRatio;
+            this.currentOpacity = lifeRatio;
         }
 
         draw() {
-            trailCtx.fillStyle = this.color + this.life + ')';
+            trailCtx.fillStyle = this.color + Math.floor(this.currentOpacity * 255).toString(16).padStart(2, '0');
             trailCtx.beginPath();
-            trailCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            trailCtx.arc(this.x, this.y, this.currentSize, 0, Math.PI * 2);
             trailCtx.fill();
+        }
+
+        isDead() {
+            return this.life <= 0;
         }
     }
 
+    // Spawn particules sur mousemove
     document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-
-        // Add new trail particles
-        if (trailParticles.length < maxTrailParticles) {
-            trailParticles.push(new TrailParticle(mouseX, mouseY));
-        }
+        trailParticles.push(new TrailParticle(e.clientX, e.clientY));
     });
 
+    // Animation loop unique
     function animateTrail() {
         trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
 
-        // Update and draw trail particles
+        // Update et draw toutes les particules
         for (let i = trailParticles.length - 1; i >= 0; i--) {
             trailParticles[i].update();
             trailParticles[i].draw();
 
             // Remove dead particles
-            if (trailParticles[i].life <= 0 || trailParticles[i].size <= 0.5) {
+            if (trailParticles[i].isDead()) {
                 trailParticles.splice(i, 1);
             }
         }
@@ -92,13 +87,18 @@ if (!isMobile) {
 
     animateTrail();
 
+    // Resize handler debounced
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-        trailCanvas.width = window.innerWidth;
-        trailCanvas.height = window.innerHeight;
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            trailCanvas.width = window.innerWidth;
+            trailCanvas.height = window.innerHeight;
+        }, 200);
     });
 }
 
-// ===== Optimized Background Particles =====
+// ===== Optimized Background Particles - MAX PERFORMANCES =====
 const canvas = document.getElementById('particlesCanvas');
 const ctx = canvas.getContext('2d', { alpha: true });
 
@@ -107,8 +107,8 @@ canvas.height = window.innerHeight;
 
 const particles = [];
 const particleCount = isMobile ? 15 : 25;
-const maxDistance = 120; // For squared distance comparison
-const maxDistanceSquared = maxDistance * maxDistance;
+const maxDistance = 100;
+const maxDistanceSquared = maxDistance * maxDistance; // Distance au carré
 
 class Particle {
     constructor() {
@@ -152,17 +152,17 @@ function animateParticles() {
         particles[i].draw();
     }
 
-    // Draw connections - optimized with squared distance
+    // Draw connections - MAX 2 connections par particule, distance au carré
     for (let i = 0; i < particles.length; i++) {
         let connectionCount = 0;
-        const maxConnections = 3;
+        const maxConnections = 2;
 
         for (let j = i + 1; j < particles.length; j++) {
             if (connectionCount >= maxConnections) break;
 
             const dx = particles[i].x - particles[j].x;
             const dy = particles[i].y - particles[j].y;
-            const distanceSquared = dx * dx + dy * dy; // No sqrt!
+            const distanceSquared = dx * dx + dy * dy; // PAS de Math.sqrt()
 
             if (distanceSquared < maxDistanceSquared) {
                 const opacity = 0.08 * (1 - distanceSquared / maxDistanceSquared);
@@ -182,40 +182,41 @@ function animateParticles() {
 
 animateParticles();
 
+// Resize handler debounced
+let particleResizeTimeout;
 window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    clearTimeout(particleResizeTimeout);
+    particleResizeTimeout = setTimeout(() => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }, 200);
 });
 
-// ===== Text Reveal on Scroll with IntersectionObserver =====
-const revealTextObserver = new IntersectionObserver((entries) => {
+// ===== Global IntersectionObserver - UN SEUL OBSERVER =====
+const globalObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('revealed');
-            revealTextObserver.unobserve(entry.target);
+            globalObserver.unobserve(entry.target);
         }
     });
-}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+}, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
 
+// Observer tous les éléments reveal
 document.querySelectorAll('.section-title, .section-subtitle').forEach(el => {
     el.classList.add('reveal-text');
-    revealTextObserver.observe(el);
+    globalObserver.observe(el);
 });
 
 // ===== Navbar Scroll Effect =====
 const navbar = document.getElementById('navbar');
-let lastScroll = 0;
 
 window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-
-    if (currentScroll > 50) {
+    if (window.pageYOffset > 50) {
         navbar.classList.add('scrolled');
     } else {
         navbar.classList.remove('scrolled');
     }
-
-    lastScroll = currentScroll;
 }, { passive: true });
 
 // ===== Mobile Menu Toggle =====
@@ -243,29 +244,55 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// ===== Smooth Scroll Animation =====
-const observerOptions = {
-    root: null,
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
+// ===== Smooth Scroll Custom avec Lerp - ANCRES NAV UNIQUEMENT =====
+function lerp(start, end, factor) {
+    return start + (end - start) * factor;
+}
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
+let isScrolling = false;
+let targetScrollY = 0;
+let currentScrollY = window.pageYOffset;
+
+function smoothScrollTo(targetY) {
+    targetScrollY = targetY;
+    if (!isScrolling) {
+        isScrolling = true;
+        smoothScrollLoop();
+    }
+}
+
+function smoothScrollLoop() {
+    currentScrollY = lerp(currentScrollY, targetScrollY, 0.1);
+    window.scrollTo(0, currentScrollY);
+
+    if (Math.abs(targetScrollY - currentScrollY) > 0.5) {
+        requestAnimationFrame(smoothScrollLoop);
+    } else {
+        window.scrollTo(0, targetScrollY);
+        isScrolling = false;
+    }
+}
+
+// Appliquer smooth scroll sur les ancres nav uniquement
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+
+        // Don't prevent default for # only
+        if (href === '#') return;
+
+        e.preventDefault();
+
+        const targetId = href.substring(1);
+        const targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+            const navbarHeight = navbar.offsetHeight;
+            const targetPosition = targetElement.offsetTop - navbarHeight;
+            smoothScrollTo(targetPosition);
         }
     });
-}, observerOptions);
-
-// Observe all sections
-document.querySelectorAll('section').forEach(section => {
-    observer.observe(section);
 });
-
-// Make hero section visible immediately
-document.querySelector('.hero')?.classList.add('visible');
 
 // ===== Animate Cards on Scroll with Stagger Effect =====
 const cardObserver = new IntersectionObserver((entries) => {
@@ -287,7 +314,7 @@ const cardObserver = new IntersectionObserver((entries) => {
             cardObserver.unobserve(entry.target);
         }
     });
-}, { threshold: 0.1, rootMargin: '0px 0px -100px 0px' });
+}, { threshold: 0.08, rootMargin: '0px 0px -100px 0px' });
 
 // Observe sections that contain cards
 document.querySelectorAll('.services, .avantages, .tarifs, .stats').forEach(section => {
@@ -396,31 +423,6 @@ window.addEventListener('scroll', () => {
         ticking = true;
     }
 }, { passive: true });
-
-// ===== Smooth Scroll for Anchor Links =====
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-
-        // Don't prevent default for # only
-        if (href === '#') return;
-
-        e.preventDefault();
-
-        const targetId = href.substring(1);
-        const targetElement = document.getElementById(targetId);
-
-        if (targetElement) {
-            const navbarHeight = navbar.offsetHeight;
-            const targetPosition = targetElement.offsetTop - navbarHeight;
-
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
-        }
-    });
-});
 
 // ===== Typing Effect for Hero Title =====
 const heroTitle = document.querySelector('.hero-title');
@@ -534,44 +536,6 @@ formInputs.forEach(input => {
     });
 });
 
-// ===== Add Glitch Effect to Logo on Hover =====
-const logo = document.querySelector('.logo');
-if (logo) {
-    logo.addEventListener('mouseenter', function() {
-        this.style.animation = 'glitch 0.3s ease';
-    });
-
-    logo.addEventListener('animationend', function() {
-        this.style.animation = '';
-    });
-}
-
-// Add glitch animation
-const glitchStyle = document.createElement('style');
-glitchStyle.textContent = `
-    @keyframes glitch {
-        0% {
-            transform: translate(0);
-        }
-        20% {
-            transform: translate(-2px, 2px);
-        }
-        40% {
-            transform: translate(-2px, -2px);
-        }
-        60% {
-            transform: translate(2px, 2px);
-        }
-        80% {
-            transform: translate(2px, -2px);
-        }
-        100% {
-            transform: translate(0);
-        }
-    }
-`;
-document.head.appendChild(glitchStyle);
-
 // ===== Performance: Disable animations on low-end devices =====
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.querySelectorAll('*').forEach(el => {
@@ -580,5 +544,5 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     });
 }
 
-console.log('✨ Magic Industries - Premium Website Loaded Successfully!');
-console.log('🚀 Featuring: Cursor Trail, Optimized Particles, 60fps Animations & More!');
+console.log('✨ Magic Industries - Ultra-Optimized 60fps Website!');
+console.log('🚀 Cursor Trail Canvas | Optimized Particles | Smooth Scroll Lerp');

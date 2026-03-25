@@ -76,7 +76,7 @@
     </div>
 
     <!-- Cursor Trail Canvas -->
-    <canvas id="cursorTrail" class="cursor-trail"></canvas>
+    <canvas id="trailCanvas" class="trail-canvas"></canvas>
 
     <!-- Particles Container -->
     <canvas id="particlesCanvas" class="particles-canvas"></canvas>
@@ -85,7 +85,18 @@
     <nav class="navbar" id="navbar">
         <div class="container">
             <div class="nav-content">
-                <a href="#" class="logo">Magic Industries</a>
+                <a href="#" class="logo">
+                    <svg class="logo-icon" width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M6 28L6 8L13 18L18 8L23 18L30 8L30 28M13 18L13 28M23 18L23 28" stroke="url(#logoGradient)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                    <span class="logo-text">Magic Industries</span>
+                </a>
                 <button class="menu-toggle" id="menuToggle">
                     <span></span>
                     <span></span>
