@@ -563,5 +563,5 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     });
 }
 
-console.log('✨ Magic Industries - Ultra-Optimized 60fps Website!');
+console.log('✨ Magic Web - Ultra-Optimized 60fps Website!');
 console.log('🚀 Cursor Trail + Glow | Optimized Particles | Smooth Scroll Lerp');
