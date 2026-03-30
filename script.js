@@ -18,110 +18,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1200);
 });
 
-// ===== Mouse Effects (Trail + Glow) - OPTIMISÉ =====
+// ===== Custom Cursor - Simple Red Circle =====
 if (!isMobile) {
-    const trailCanvas = document.getElementById('trailCanvas');
-    const trailCtx = trailCanvas.getContext('2d', { alpha: true });
-    const mouseGlow = document.getElementById('mouseGlow');
+    const customCursor = document.getElementById('mouseGlow');
 
-    trailCanvas.width = window.innerWidth;
-    trailCanvas.height = window.innerHeight;
-
-    const trailParticles = [];
-    const violet = '#a855f7';
-    const cyan = '#06b6d4';
-
-    let lastTrailTime = 0;
-    let mouseX = 0;
-    let mouseY = 0;
-    let glowUpdateScheduled = false;
-
-    class TrailParticle {
-        constructor(x, y) {
-            this.x = x;
-            this.y = y;
-            this.size = Math.random() * 4 + 4; // 4-8px
-            this.color = Math.random() > 0.5 ? violet : cyan;
-            this.life = 40; // 40 frames lifetime
-            this.maxLife = 40;
-        }
-
-        update() {
-            this.life--;
-            this.y += 0.3; // Déplacement vers le bas
-
-            // Easing out pour la taille et l'opacité
-            const lifeRatio = this.life / this.maxLife;
-            this.currentSize = this.size * lifeRatio;
-            this.currentOpacity = lifeRatio;
-        }
-
-        draw() {
-            trailCtx.fillStyle = this.color + Math.floor(this.currentOpacity * 255).toString(16).padStart(2, '0');
-            trailCtx.beginPath();
-            trailCtx.arc(this.x, this.y, this.currentSize, 0, Math.PI * 2);
-            trailCtx.fill();
-        }
-
-        isDead() {
-            return this.life <= 0;
-        }
-    }
-
-    // Update mouse glow via RAF
-    function updateMouseGlow() {
-        mouseGlow.style.left = mouseX + 'px';
-        mouseGlow.style.top = mouseY + 'px';
-        glowUpdateScheduled = false;
-    }
-
-    // Listener mousemove fusionné (trail throttle + glow RAF)
     document.addEventListener('mousemove', (e) => {
-        const now = Date.now();
-
-        // Trail throttle à 16ms (1 frame)
-        if (now - lastTrailTime >= 16) {
-            trailParticles.push(new TrailParticle(e.clientX, e.clientY));
-            lastTrailTime = now;
-        }
-
-        // Mouse glow position update (via RAF pour smooth)
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        if (!glowUpdateScheduled) {
-            glowUpdateScheduled = true;
-            requestAnimationFrame(updateMouseGlow);
-        }
-    });
-
-    // Animation loop unique pour trail
-    function animateTrail() {
-        trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
-
-        // Update et draw toutes les particules
-        for (let i = trailParticles.length - 1; i >= 0; i--) {
-            trailParticles[i].update();
-            trailParticles[i].draw();
-
-            // Remove dead particles
-            if (trailParticles[i].isDead()) {
-                trailParticles.splice(i, 1);
-            }
-        }
-
-        requestAnimationFrame(animateTrail);
-    }
-
-    animateTrail();
-
-    // Resize handler debounced
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-            trailCanvas.width = window.innerWidth;
-            trailCanvas.height = window.innerHeight;
-        }, 200);
+        customCursor.style.left = e.clientX + 'px';
+        customCursor.style.top = e.clientY + 'px';
     });
 }
 
