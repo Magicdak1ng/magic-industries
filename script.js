@@ -1,3 +1,18 @@
+// ===== Page Loader =====
+window.addEventListener('load', () => {
+    const loader = document.getElementById('loader');
+    if (loader) {
+        // Attendre que l'animation soit terminée (1s)
+        setTimeout(() => {
+            loader.classList.add('fade-out');
+            // Retirer complètement du DOM après le fade-out
+            setTimeout(() => {
+                loader.remove();
+            }, 500);
+        }, 1000);
+    }
+});
+
 // ===== Smooth Scrolling =====
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
